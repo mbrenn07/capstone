@@ -16,4 +16,6 @@ Note: If you get an error about ollama not being found, try restarting your VSco
 
 4) Run `cd kos; npm install`
 
+### Both
+
 5) 'bash start.sh'
