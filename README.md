@@ -1,6 +1,6 @@
 # Capstone
 
-## Instillation Instructions
+## Installation Instructions
 
 ### (Backend)
 
