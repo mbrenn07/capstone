@@ -2,7 +2,7 @@
 
 ## Installation Instructions
 
-### (Backend)
+### Backend
 
 1) Run `cd hippocrates; pip install -r requirements.txt`
 
@@ -12,7 +12,7 @@
 
 Note: If you get an error about ollama not being found, try restarting your VScode by closing every open window and try again.
 
-### (Frontend)
+### Frontend
 
 4) Run `cd kos; npm install`
 
