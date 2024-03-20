@@ -1,8 +1,8 @@
 # Capstone
 
-## Instillation Instructions
+## Installation Instructions
 
-### (Backend)
+### Backend
 
 1) Run `cd hippocrates; pip install -r requirements.txt`
 
@@ -12,7 +12,7 @@
 
 Note: If you get an error about ollama not being found, try restarting your VScode by closing every open window and try again.
 
-### (Frontend)
+### Frontend
 
 4) Run `cd kos; npm install`
 
@@ -20,4 +20,8 @@ Note: If you get an error about ollama not being found, try restarting your VSco
 
 ### Both
 
+<<<<<<< HEAD
 6) 'bash start.sh'
+=======
+5) 'bash start.sh'
+>>>>>>> e25ea4b326c6952aac9c59074c0b119bd8764020
