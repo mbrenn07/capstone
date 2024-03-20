@@ -30,6 +30,7 @@ export default function TabOneScreen() {
       <ScrollView style={styles.chatHistory}>
         {messages.map((message, index) => (
           <ScrollView
+            nestedScrollEnabled={true}
             key={index} //NOSONAR
             style={message.role == "user" ? styles.messageListItemUser : styles.messageListItemAssistant}
           >
@@ -77,7 +78,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   chatHistory: {
-    nestedScrollEnabled: true,
     display: "flex",
     flexDirection: "column",
     width: "100%",
@@ -90,24 +90,22 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   messageListItemUser: {
-    nestedScrollEnabled: true,
     margin: 3,
     maxWidth: "40%",
     maxHeight: 400,
     borderRadius: 4,
     backgroundColor: "red",
-    alignSelf: "self-end",
+    alignSelf: "flex-end",
     flexGrow: 0,
   },
   messageListItemAssistant: {
-    nestedScrollEnabled: true,
     margin: 3,
     maxWidth: "40%",
     maxHeight: 400,
     borderRadius: 4,
     backgroundColor: "blue",
     flexGrow: 0,
-    alignSelf: "self-start",
+    alignSelf: "flex-start",
   },
   textInput: {
     flex: 1,
