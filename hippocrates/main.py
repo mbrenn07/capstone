@@ -24,6 +24,12 @@ previousMessages = []
 app = Flask(__name__)
 cors = CORS(app)
 
+@app.route("/initialPrompt/<initialPrompt>")
+def initialPrompt(initialPrompt):
+    previousMessages.append({
+            'role': 'system',
+            'content': initialPrompt,
+    })
 
 @app.route("/chat/<message>")
 def main(message):
@@ -52,8 +58,6 @@ def main(message):
     })
 
     response = ollama.chat(model='llama2', messages=previousMessages)
-
-    print(context)
 
     previousMessages.append(response['message'])
 
