@@ -16,6 +16,8 @@ Note: If you get an error about ollama not being found, try restarting your VSco
 
 4) Run `cd kos; npm install`
 
+5) Run `npm run android` and follow the provided steps to set up the android emulator or use your own device
+
 ### Both
 
-5) 'bash start.sh'
+6) 'bash start.sh'

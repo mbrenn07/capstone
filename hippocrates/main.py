@@ -53,6 +53,8 @@ def main(message):
 
     response = ollama.chat(model='llama2', messages=previousMessages)
 
+    print(context)
+
     previousMessages.append(response['message'])
 
     return response['message']['content']
