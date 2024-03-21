@@ -102,49 +102,31 @@ const permissions: HealthKitPermissions = {
     },
 };
 
-AppleHealthKit.initHealthKit(permissions, (error: string) => {
-    /* Called after we receive a response from the system */
-  
-    if (error) {
-      console.log('[ERROR] Cannot grant permissions!')
-    }
-  
-    /* Can now read or write to HealthKit */
-  
-    const options = {
-      startDate: new Date(2020, 1, 1).toISOString(),
-    }
-  
-    AppleHealthKit.getHeartRateSamples(
-      options,
-      (callbackError: string, results: HealthValue[]) => {
-        /* Samples are now collected from HealthKit */
-      },
-    )
-
-  })
 
 export default function TabThreeScreen() {
-    const [stepCount, setStepCount] = useState(0);
+  const [stepCount, setStepCount] = useState(0);
 
-    useEffect(() => {
-      // Your API call to fetch step count
-      AppleHealthKit.getStepCount({}, (err, results) => {
-        if (!err && results) {
-          setStepCount(results.value); // Assuming `value` contains the step count
-        }
+  useEffect(() => {
+      AppleHealthKit.initHealthKit(permissions, (error: string) => {
+          if (error) {
+              console.log('[ERROR] Cannot grant permissions:', error);
+          } else {
+              // Successfully initialized HealthKit
+              fetchStepCount();
+          }
       });
-    }, []);
-  
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Health Page</Text>
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Text>Step Count: {stepCount}</Text>
-        <EditScreenInfo path="app/(tabs)/three.tsx" />
-      </View>
-    );
-  }
+  }, []);
+
+  const fetchStepCount = () => {
+      AppleHealthKit.getStepCount({}, (err, results) => {
+          if (!err && results) {
+              setStepCount(results.value); // Assuming `value` contains the step count
+          } else {
+              console.log('[ERROR] Failed to fetch step count:', err);
+          }
+      });
+  };
+}
 
 const styles = StyleSheet.create({
   container: {
