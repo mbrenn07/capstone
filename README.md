@@ -20,11 +20,14 @@ Note: If you get an error about ollama not being found, try restarting your VSco
 
 ### Frontend (iOS)
 
-6) Run `cd DocBotHealth`
+6) Run `cd DocBotHealth/`
 
 7) Run `npx expo start -c` until rebuilding is done. Once it displays the option, CTRL+C
 
 8) Run `npm run ios` and this should install CocoaPods and install all dependencies
+
+Note: If encountering an error like "Unable to resolve "x" from "y", cd into "DocBotHealth/" and run 'npm install',
+      then cd in into "ios/" and run "pod install", then repeat steps 6-8.
 ### Both
 
 9) `bash start.sh`
