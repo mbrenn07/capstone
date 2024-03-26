@@ -12,12 +12,19 @@
 
 Note: If you get an error about ollama not being found, try restarting your VScode by closing every open window and try again.
 
-### Frontend
+### Frontend (Other)
 
-4) Run `cd kos; npm install`
+4) Run `cd DocBotHealth; npm install`
 
 5) Run `npm run android` and follow the provided steps to set up the android emulator or use your own device
 
+### Frontend (iOS)
+
+6) Run `cd DocBotHealth`
+
+7) Run `npx expo start -c` until rebuilding is done. Once it displays the option, CTRL+C
+
+8) Run `npm run ios` and this should install CocoaPods and install all dependencies
 ### Both
 
-6) `bash start.sh`
+9) `bash start.sh`
