@@ -1,3 +1,4 @@
+//BEGIN MOBILE ONLY
 import { polyfill } from 'react-native-polyfill-globals/src/fetch';
 import 'text-encoding-polyfill';
 import 'react-native-get-random-values';
@@ -5,13 +6,13 @@ import 'react-native-url-polyfill/auto';
 import { ReadableStream } from 'web-streams-polyfill';
 globalThis.ReadableStream = ReadableStream;
 polyfill();
+//END MOBILE ONLY
 import { StyleSheet, ScrollView } from 'react-native';
 import axios from 'axios';
 import { useState } from "react";
 import { View } from '@/components/Themed';
 import { TextInput, IconButton, MD3Colors, Text } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
-import Translate from './Translate';
 
 
 const languageCodes = {
@@ -91,7 +92,7 @@ export default function TabOneScreen() {
       baseURL + "/chat/" + message,
       {
         method: 'GET',
-        reactNative: { textStreaming: true },
+        reactNative: { textStreaming: true }, //MOBILE ONLY
       }
     )
     if (response.status !== 200) throw new Error(response.status.toString())
