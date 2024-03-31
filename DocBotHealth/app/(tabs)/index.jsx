@@ -1,3 +1,10 @@
+import { polyfill } from 'react-native-polyfill-globals/src/fetch';
+import 'text-encoding-polyfill';
+import 'react-native-get-random-values';
+import 'react-native-url-polyfill/auto';
+import { ReadableStream } from 'web-streams-polyfill';
+globalThis.ReadableStream = ReadableStream;
+polyfill();
 import { StyleSheet, ScrollView } from 'react-native';
 import axios from 'axios';
 import { useState } from "react";
@@ -8,20 +15,51 @@ export default function TabOneScreen() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
 
+  const baseURL = "http://10.0.2.2:5000/";
+
   const baseInstance = axios.create({
-    baseURL: "http://10.0.2.2:5000/", //use 10.0.2.2 instead of localhost for android virtual machine
+    baseURL: baseURL, //use 10.0.2.2 instead of localhost for android virtual machine
     timeout: undefined
   });
 
-  const sendMessage = () => {
+  const generateStream = async () => {
+    const response = await fetch(
+      baseURL + "/chat/" + message,
+      {
+        method: 'GET',
+        reactNative: { textStreaming: true },
+      }
+    )
+    if (response.status !== 200) throw new Error(response.status.toString())
+    if (!response.body) throw new Error('Response body does not exist')
+    return getIterableStream(response.body)
+  }
+
+  async function* getIterableStream(body) {
+    const reader = body.getReader()
+    const decoder = new TextDecoder()
+  
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) {
+        break
+      }
+      const decodedChunk = decoder.decode(value, { stream: true })
+      yield decodedChunk
+    }
+  }
+
+  const sendMessage = async () => {
     if (message != "") {
       messages.push({ role: "user", message: message });
       setMessage("");
+      messages.push({ role: "assistant", message: "" });
       setMessages([...messages]);
-      baseInstance.get("/chat/" + message).then((data) => {
-        messages.push({ role: "assistant", message: data.data });
+      const stream = await generateStream();
+      for await (const chunk of stream) {
+        messages[messages.length - 1].message = messages[messages.length - 1].message + chunk;
         setMessages([...messages]);
-      }).catch((e) => console.error(e));
+      }
     }
   }
 

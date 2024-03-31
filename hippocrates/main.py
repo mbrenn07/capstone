@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Response, stream_with_context
 from flask_cors import CORS
 import ollama
 import json
@@ -57,11 +57,13 @@ def main(message):
             'content': message,
     })
 
-    response = ollama.chat(model='llama2', messages=previousMessages)
+    stream = ollama.chat(model='medllama2:7b-q2_K', messages=previousMessages, stream=True)
 
-    previousMessages.append(response['message'])
+    def generate():
+        for chunk in stream:
+            yield chunk['message']['content']
 
-    return response['message']['content']
+    return Response(stream_with_context(generate()))
 
 @app.route("/clear")
 def clear():
