@@ -3,10 +3,74 @@ import axios from 'axios';
 import { useState } from "react";
 import { View } from '@/components/Themed';
 import { TextInput, IconButton, MD3Colors, Text } from 'react-native-paper';
+import { Picker } from '@react-native-picker/picker';
+import Translate from './Translate';
+
+
+const languageCodes = {
+  'Amharic': 'am',
+  'Arabic': 'ar',
+  'Basque': 'eu',
+  'Bengali': 'bn',
+  'English (UK)': 'en-GB',
+  'Portuguese (Brazil)': 'pt-BR',
+  'Bulgarian': 'bg',
+  'Catalan': 'ca',
+  'Cherokee': 'chr',
+  'Croatian': 'hr',
+  'Czech': 'cs',
+  'Danish': 'da',
+  'Dutch': 'nl',
+  'English (US)': 'en',
+  'Estonian': 'et',
+  'Filipino': 'fil',
+  'Finnish': 'fi',
+  'French': 'fr',
+  'German': 'de',
+  'Greek': 'el',
+  'Gujarati': 'gu',
+  'Hebrew': 'iw',
+  'Hindi': 'hi',
+  'Hungarian': 'hu',
+  'Icelandic': 'is',
+  'Indonesian': 'id',
+  'Italian': 'it',
+  'Japanese': 'ja',
+  'Kannada': 'kn',
+  'Korean': 'ko',
+  'Latvian': 'lv',
+  'Lithuanian': 'lt',
+  'Malay': 'ms',
+  'Malayalam': 'ml',
+  'Marathi': 'mr',
+  'Norwegian': 'no',
+  'Polish': 'pl',
+  'Portuguese (Portugal)': 'pt-PT',
+  'Romanian': 'ro',
+  'Russian': 'ru',
+  'Serbian': 'sr',
+  'Chinese (PRC)': 'zh-CN',
+  'Slovak': 'sk',
+  'Slovenian': 'sl',
+  'Spanish': 'es',
+  'Swahili': 'sw',
+  'Swedish': 'sv',
+  'Tamil': 'ta',
+  'Telugu': 'te',
+  'Thai': 'th',
+  'Chinese (Taiwan)': 'zh-TW',
+  'Turkish': 'tr',
+  'Urdu': 'ur',
+  'Ukrainian': 'uk',
+  'Vietnamese': 'vi',
+  'Welsh': 'cy',
+};
+
 
 export default function TabOneScreen() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [selectedLanguage, setSelectedLanguage] = useState('English (US)');
 
   const baseInstance = axios.create({
     baseURL: "http://10.0.2.2:5000/", //use 10.0.2.2 instead of localhost for android virtual machine
@@ -18,6 +82,9 @@ export default function TabOneScreen() {
       messages.push({ role: "user", message: message });
       setMessage("");
       setMessages([...messages]);
+      if (selectedLanguage != "English (US)") {
+        <Translate sourceLang='en' targetLang={languageCodes[selectedLanguage]} sourceText={message} />
+      }
       baseInstance.get("/chat/" + message).then((data) => {
         messages.push({ role: "assistant", message: data.data });
         setMessages([...messages]);
@@ -41,6 +108,14 @@ export default function TabOneScreen() {
         ))}
       </ScrollView>
       <View style={styles.stack}>
+      <Picker
+          selectedValue={selectedLanguage}
+          onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
+        >
+          {Object.keys(languageCodes).map((language) => (
+            <Picker.Item key={language} label={language} value={language} />
+          ))}
+        </Picker>
         <TextInput
           onSubmitEditing={(e) => {
             e.preventDefault();
