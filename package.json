@@ -1,5 +1,0 @@
-{
-  "dependencies": {
-    "@google-cloud/translate": "^8.1.0"
-  }
-}
