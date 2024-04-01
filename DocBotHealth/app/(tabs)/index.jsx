@@ -79,6 +79,7 @@ export default function TabOneScreen() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState('English (US)');
+  const [recievingResponse, setRecievingResponse] = useState(false);
 
   const baseURL = "http://10.0.2.2:5000/";
 
@@ -120,11 +121,13 @@ export default function TabOneScreen() {
       setMessage("");
       messages.push({ role: "assistant", message: "" });
       setMessages([...messages]);
+      setRecievingResponse(true);
       const stream = await generateStream();
       for await (const chunk of stream) {
         messages[messages.length - 1].message = messages[messages.length - 1].message + chunk;
         setMessages([...messages]);
       }
+      setRecievingResponse(false);
     }
   }
 
@@ -153,6 +156,7 @@ export default function TabOneScreen() {
           ))}
         </Picker>
         <TextInput
+          disabled={recievingResponse}
           onSubmitEditing={(e) => {
             e.preventDefault();
             sendMessage();

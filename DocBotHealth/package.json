@@ -30,7 +30,8 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.6",
     "text-encoding-polyfill": "^0.6.7",
-    "web-streams-polyfill": "^4.0.0"
+    "web-streams-polyfill": "^4.0.0",
+    "expo-build-properties": "~0.11.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

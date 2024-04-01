@@ -59,8 +59,14 @@ def main(message):
 
     stream = ollama.chat(model='medllama2:7b-q2_K', messages=previousMessages, stream=True)
 
+    previousMessages.append({
+            'role': 'user',
+            'content': "",
+    })
+
     def generate():
         for chunk in stream:
+            previousMessages[-1]['content'] = previousMessages[-1]['content'] + chunk['message']['content']
             yield chunk['message']['content']
 
     return Response(stream_with_context(generate()))

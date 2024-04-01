@@ -32,8 +32,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      ["expo-build-properties", {
+        "android": {
+          "usesCleartextTraffic": true
+        }
+      }],
       "react-native-health",
-      "expo-router"
+      "expo-router",
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true
