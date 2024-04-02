@@ -94,6 +94,55 @@ const options = {
   includeManuallyAdded: false, // optional: default true
 };
 
+const sleepGraph = {
+  Labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  datasets: [
+    {
+      data: [AppleHealthKit.getSleepSamples(options, (err: Object, results: Array<HealthValue>) => {
+        if (err) {
+          return;
+        }
+        console.log("Sleep on given date(s): " + JSON.stringify(results))
+      },
+      )],
+    },
+  ],
+};
+
+const heartRateGraph = {
+  Labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  datasets: [
+    {
+      data: [AppleHealthKit.getHeartRateSamples((options), 
+        (err: Object, results: HealthValue[]) => {
+        if (err) {
+          return
+        }
+        console.log("Heart rate on given date(s): " + JSON.stringify(results))
+      }, 
+      )],
+    },
+  ],
+};
+
+const stepsGraph = {
+  Labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  datasets: [
+    {
+      data: [AppleHealthKit.getStepCount(
+        (options),
+        (err: Object, results: HealthValue) => {
+          if (err) {
+            return
+          }
+          console.log("Steps on given date(s): " + JSON.stringify(results))
+        },
+      )],
+    },
+  ],
+};
+
+
 export default function App() {
   const [hasPermissions, setHasPermissions] = useState(false);
   const [gender, setGender] = useState("")
@@ -143,6 +192,11 @@ export default function App() {
         console.log("Steps on given date(s): " + JSON.stringify(results))
       },
     )
+
+
+
+
+
   }, [hasPermissions]) 
 
   return (
