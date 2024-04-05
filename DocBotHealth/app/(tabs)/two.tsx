@@ -1,9 +1,16 @@
 import { StyleSheet } from 'react-native';
-
+import React, { useContext, useEffect } from 'react';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import UserContext from '@/constants/UserContext';
+
 
 export default function TabTwoScreen() {
+  const user = useContext(UserContext);
+  useEffect(() => {
+    user.setUser({name: "hi"});
+  }, []);
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab Two</Text>

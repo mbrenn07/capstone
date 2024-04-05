@@ -3,9 +3,9 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PaperProvider } from 'react-native-paper';
-
+import UserContext from '@/constants/UserContext';
 import { useColorScheme } from '@/components/useColorScheme';
 
 export {
@@ -46,15 +46,19 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const [user, setUser] = useState({});
+
   const colorScheme = useColorScheme();
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <PaperProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        </Stack>
+        <UserContext.Provider value={{user: user, setUser: setUser}}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }}/>
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          </Stack>
+        </UserContext.Provider>
       </PaperProvider>
     </ThemeProvider>
   );

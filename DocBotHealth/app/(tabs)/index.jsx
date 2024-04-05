@@ -9,10 +9,11 @@ polyfill();
 //END MOBILE ONLY
 import { StyleSheet, ScrollView } from 'react-native';
 import axios from 'axios';
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import { View } from '@/components/Themed';
 import { TextInput, IconButton, MD3Colors, Text } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
+import UserContext from '@/constants/UserContext';
 
 
 const languageCodes = {
@@ -80,6 +81,11 @@ export default function TabOneScreen() {
   const [messages, setMessages] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState('English (US)');
   const [recievingResponse, setRecievingResponse] = useState(false);
+  const user = useContext(UserContext);
+
+  useEffect(() => {
+    console.log(user.user);
+  }, [user.user]);
 
   const baseURL = "http://10.0.2.2:5000/";
 
