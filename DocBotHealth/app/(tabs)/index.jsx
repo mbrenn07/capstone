@@ -14,6 +14,7 @@ import { View } from '@/components/Themed';
 import { TextInput, IconButton, MD3Colors, Text } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import UserContext from '@/constants/UserContext';
+import * as Linking from 'expo-linking';
 
 
 const languageCodes = {
@@ -83,10 +84,6 @@ export default function TabOneScreen() {
   const [recievingResponse, setRecievingResponse] = useState(false);
   const user = useContext(UserContext);
 
-  useEffect(() => {
-    console.log(user.user);
-  }, [user.user]);
-
   const baseURL = "http://10.0.2.2:5000/";
 
   const baseInstance = axios.create({
@@ -134,6 +131,11 @@ export default function TabOneScreen() {
         setMessages([...messages]);
       }
       setRecievingResponse(false);
+      if (false) { //TODO: determine when to call emergency contact
+        if (user.user.emergencyPhoneNumber) {
+          Linking.openURL("tel:" + user.user.emergencyPhoneNumber);
+        }
+      }
     }
   }
 
