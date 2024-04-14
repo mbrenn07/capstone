@@ -54,6 +54,13 @@ export default function TabLayout(props: any) {
           tabBarIcon: ({ color }) => <AntDesign name="user" size={24} color={color} />,
         }}
       />
+            <Tabs.Screen
+        name="three"
+        options={{
+          title: 'Health Data',
+          tabBarIcon: ({ color }) => <AntDesign name="database" size={24} color={color} />,
+        }}
+      />
     </Tabs>
   );
 }

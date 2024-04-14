@@ -28,6 +28,8 @@ Note: If you get an error about ollama not being found, try restarting your VSco
 
 Note: If encountering an error like "Unable to resolve "x" from "y", cd into "DocBotHealth/" and run 'npm install',
       then cd in into "ios/" and run "pod install", then repeat steps 6-8.
+
+Note: If any errors relating to pods occur, make sure that there are no spaces in the names of the files in your working directory.
 ### Both
 
 9) `bash start.sh`
