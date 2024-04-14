@@ -25,6 +25,14 @@ export default function TabTwoScreen() {
               }
             }}
           />
+                {/* <Picker
+          selectedValue={selectedLanguage}
+          onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
+        >
+          {Object.keys(languageCodes).map((language) => (
+            <Picker.Item key={language} label={language} value={language} />
+          ))}
+        </Picker> */}
     </View>
   );
 }

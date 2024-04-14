@@ -2,6 +2,7 @@ from flask import Flask, Response, stream_with_context
 from flask_cors import CORS
 import ollama
 import json
+import time
 from sentence_transformers import SentenceTransformer, util
 
 # Used to initially download the model locally
@@ -39,10 +40,10 @@ def main(message):
     all_combinations = []
     for i in range(len(dot_sim) - 1):
         all_combinations.append([dot_sim[i][0], i])
-    dot_sim = sorted(dot_sim, key=lambda x: x[0], reverse=True)
+    all_combinations = sorted(all_combinations, key=lambda x: x[0], reverse=True)
 
-    context = " Here is some additional context about the problem: "
-    for score, i in all_combinations[0:5]:
+    context = " Here is some additional context about the problem:"
+    for score, i in all_combinations[0:3]:
         context = context + sentences[i] + ", "
 
     context = context[:-2]
@@ -59,8 +60,10 @@ def main(message):
 
     stream = ollama.chat(model='medllama2:7b-q2_K', messages=previousMessages, stream=True)
 
+    del previousMessages[-2]
+
     previousMessages.append({
-            'role': 'user',
+            'role': 'assistant',
             'content': "",
     })
 

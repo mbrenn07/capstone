@@ -15,6 +15,7 @@ import { TextInput, IconButton, MD3Colors, Text } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import UserContext from '@/constants/UserContext';
 import * as Linking from 'expo-linking';
+import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 
 
 const languageCodes = {
@@ -107,7 +108,7 @@ export default function TabOneScreen() {
   async function* getIterableStream(body) {
     const reader = body.getReader()
     const decoder = new TextDecoder()
-  
+
     while (true) {
       const { value, done } = await reader.read()
       if (done) {
@@ -131,11 +132,6 @@ export default function TabOneScreen() {
         setMessages([...messages]);
       }
       setRecievingResponse(false);
-      if (false) { //TODO: determine when to call emergency contact
-        if (user.user.emergencyPhoneNumber) {
-          Linking.openURL("tel:" + user.user.emergencyPhoneNumber);
-        }
-      }
     }
   }
 
@@ -143,40 +139,54 @@ export default function TabOneScreen() {
     <View style={styles.container}>
       <ScrollView style={styles.chatHistory}>
         {messages.map((message, index) => (
-          <ScrollView
-            nestedScrollEnabled={true}
+          <View
             key={index} //NOSONAR
-            style={message.role == "user" ? styles.messageListItemUser : styles.messageListItemAssistant}
+            style={styles.messageListItem}
           >
-            <Text style={styles.message}>
+            <View style={styles.stack}>
+              {message.role == "user" ? (
+                <FontAwesome
+                  name="user-circle"
+                  size={25}
+                  color={"black"}
+                  style={styles.messageIcon}
+                />
+              )
+                :
+                (
+                  <FontAwesome6
+                    name="user-doctor"
+                    size={25}
+                    color={"black"}
+                    style={styles.messageIcon}
+                  />
+                )}
+              <Text style={styles.messageTitle} variant="headlineSmall">
+                {message.role == "user" ? "You" : "Doc Bot"}
+              </Text>
+            </View>
+            <Text style={styles.message} variant="bodyLarge">
               {message.message}
             </Text>
-          </ScrollView>
+          </View>
         ))}
       </ScrollView>
-      <View style={styles.stack}>
-      <Picker
-          selectedValue={selectedLanguage}
-          onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
-        >
-          {Object.keys(languageCodes).map((language) => (
-            <Picker.Item key={language} label={language} value={language} />
-          ))}
-        </Picker>
+      <View style={styles.messageBar}>
         <TextInput
+          contentStyle={{backgroundColor: "white", paddingLeft: 15}}
           disabled={recievingResponse}
           onSubmitEditing={(e) => {
             e.preventDefault();
             sendMessage();
           }}
           style={styles.textInput}
-          label="Message"
+          label="Enter your symptoms here"
           value={message}
           onChangeText={message => setMessage(message)}
         />
         <IconButton
           style={styles.icon}
-          icon="send"
+          icon="magnify"
           iconColor={MD3Colors.error50}
           size={34}
           onPress={sendMessage}
@@ -192,13 +202,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  messageIcon: {
+    margin: 6,
+    marginRight: 16,
+    marginLeft: 10,
+  },
   stack: {
     display: "flex",
     flexDirection: "row",
+  },
+  messageBar: {
+    height: 60,
+    marginBottom: 10,
     width: "95%",
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: "black",
+    borderStyle: "solid"
   },
   chatHistory: {
     display: "flex",
@@ -209,31 +228,23 @@ const styles = StyleSheet.create({
   },
   message: {
     margin: 3,
-    marginLeft: 6,
+    marginLeft: 50,
     marginRight: 6,
   },
-  messageListItemUser: {
-    margin: 3,
-    maxWidth: "40%",
-    maxHeight: 400,
-    borderRadius: 4,
-    backgroundColor: "red",
-    alignSelf: "flex-end",
-    flexGrow: 0,
-  },
-  messageListItemAssistant: {
-    margin: 3,
-    maxWidth: "40%",
-    maxHeight: 400,
-    borderRadius: 4,
-    backgroundColor: "blue",
-    flexGrow: 0,
-    alignSelf: "flex-start",
-  },
-  textInput: {
+  messageTitle: {
     flex: 1,
   },
+  messageListItem: {
+    margin: 3,
+    borderRadius: 4,
+    marginTop: 10,
+    fontWeight: "bold",
+  },
+  textInput: {
+    width: "93%"
+  },
   icon: {
-    width: "50px"
+    position: "absolute",
+    left: "86%",
   }
 });
