@@ -97,7 +97,6 @@ interface ChartData {
 }
 
 const options = {
-  date: new Date().toISOString(), // optional; default now
   includeManuallyAdded: false, // optional: default true
 };
 
@@ -108,6 +107,9 @@ export default function App() {
   const [dob, setDob] = useState("");
   const [age, setAge] = useState(0);
   const [stepsData, setStepsData] = useState(0.0);
+  const [totalSteps, setTotalSteps] = useState(0);
+
+  const [currentDate, setCurrentDate] = useState("");
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
   const [sleepData, setSleepData] = useState<number[]>([]);
   //for 
@@ -119,9 +121,37 @@ export default function App() {
         return;
       }
       setHasPermissions(true)
+
+      // Call the function to fetch step count periodically
+      fetchStepCount();
+      const intervalId = setInterval(fetchStepCount, 60000); // Fetch every minute
+      
+      return () => clearInterval(intervalId); // Cleanup on component unmount
     })
-    
+    setCurrentDate(getCurrentDate());
   }, []);
+
+  const getCurrentDate = () => {
+    const date = new Date();
+    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    return formattedDate;
+  };
+
+  const fetchStepCount = () => {
+    AppleHealthKit.getStepCount(null, (err: Object, results: HealthValue) => {
+      if (err) {
+        console.log('Error fetching step count:', err);
+        return;
+      }
+      const stepsResult = results.value;
+      setTotalSteps(stepsResult)
+      const stepsFraction = stepsResult / 10000.0;
+      setStepsData(stepsFraction);
+      console.log('Steps on given date(s):', stepsFraction);
+    });
+  };
 
   useEffect(() => {
 
@@ -144,25 +174,6 @@ export default function App() {
         console.log("Date of Birth: " + resultDob);
       }
     });
-
-    AppleHealthKit.getStepCount(
-      (options),
-      (err: Object, results: HealthValue) => {
-        if (err) {
-          return
-        }
-        const stepsResult = results.value;
-        const stepsFraction = stepsResult / 10000.0;
-        setStepsData(stepsFraction);
-
-        const dataOutput = [{ 
-          data: [stepsFraction], // Store the step fraction in 'data'
-          labels: ["Steps"] // Provide a label for the data
-        }];
-        // setStepsDataOutput(dataOutput); // Wrap dataOutput in an array
-        console.log("Steps on given date(s): " + JSON.stringify(dataOutput))
-      },
-    )
 
     AppleHealthKit.getSleepSamples(options, (err: Object, results: Array<HealthValue>) => {
       if (err) {
@@ -200,46 +211,32 @@ export default function App() {
     <View style={styles.container}>
       {hasPermissions ? (
         <View>
+          <Text style={styles.chartLabel}>
+            Steps Taken on {currentDate}
+          </Text>
           <ProgressChart
             data={{
-              labels: ["Steps"],
-              data: [stepsData]
+              labels: [""],
+              data: [stepsData],
             }}
-            width={Dimensions.get("window").width}
+            width={Dimensions.get('window').width}
             height={220}
             strokeWidth={16}
             radius={32}
             chartConfig={chartConfig}
             hideLegend={false}
           />
-          <BarChart
-            style={styles.container}
-            data={{
-              labels: ["uh"],
-              datasets: [{ data: sleepData }]
-            }}
-            width={Dimensions.get("window").width}
-            height={220}
-            yAxisLabel="$"
-            chartConfig={chartConfig}
-            verticalLabelRotation={30}
-          />
-          <LineChart
-            data= {{
-              labels: ["heart rate ya "],
-              datasets: [{ data: heartRateData }] 
-            }}
-            width={Dimensions.get("window").width}
-            height={220}
-            chartConfig={chartConfig}
-          />
+          <Text style={styles.stepCountText}>
+            {totalSteps} steps
+          </Text>
         </View>
       ) : (
         <Text>No data available</Text>
       )}
     </View>
-  );  
+  );
 };
+
 const chartConfig = {
   backgroundGradientFrom: '#fff', // Background gradient color (from)
   backgroundGradientTo: '#fff', // Background gradient color (to)
