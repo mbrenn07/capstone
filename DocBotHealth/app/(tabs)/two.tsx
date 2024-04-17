@@ -167,7 +167,7 @@ export default function App() {
         <View style={styles.userInfo}>
           {Object.keys(userInfo).map(key => (
             <View style={styles.fullWidth} key={key}>
-              <Text style={styles.userInfoText}>{key.charAt(0).toUpperCase() + key.slice(1)}:</Text>
+              <Text style={styles.userInfoText}>{formatTitle(key)}:</Text>
               {isEditing ? (
                 key === 'language' ? (
                   <Picker
@@ -179,6 +179,15 @@ export default function App() {
                       <Picker.Item key={code} label={language} value={code} />
                     ))}
                   </Picker>
+                  ) : key === 'emergencyPhoneNumber' ? (
+                  <PhoneInput
+                      value={userInfo.emergencyPhoneNumber}
+                      defaultCode="US"
+                      layout="first"
+                      onChangeFormattedText={(text) => {
+                        setUserInfo({...userInfo, emergencyPhoneNumber: text});
+                      }}
+                  />
                 ) : (
                   <TextInput
                     style={styles.userInfoEdit}
@@ -195,16 +204,6 @@ export default function App() {
               )}
             </View>
           ))}
-          <PhoneInput
-            defaultCode="US"
-            layout="first"
-            onChangeFormattedText={(text) => {
-              var re = /^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/gm
-              if (re.test(text)) {
-                userContext.setUser({ ...userContext.user, emergencyPhoneNumber: text });
-              }
-            }}
-          />
         </View>
         <TouchableOpacity onPress={handleEditToggle} style={styles.buttonStyle}>
           <Text style={styles.buttonText}>{isEditing ? 'Confirm' : 'Edit Information'}</Text>
@@ -273,3 +272,10 @@ const styles = StyleSheet.create({
     height: 40,
   },
 });
+
+function formatTitle(key) {
+  // Split the string at each uppercase letter, but include the letter in the result
+  return key
+    .replace(/([A-Z])/g, ' $1') // Insert a space before each uppercase letter
+    .replace(/^./, (str) => str.toUpperCase()); // Capitalize the first letter of the string
+}
