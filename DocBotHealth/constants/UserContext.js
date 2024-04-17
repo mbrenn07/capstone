@@ -14,6 +14,7 @@ export const UserProvider = ({ children }) => {
     String, healthConditions,
     String, profileImage,
     language,
+    emergencyPhoneNumber,
   });
 
   return (

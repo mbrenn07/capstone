@@ -6,6 +6,7 @@ import UserContext from '@/constants/UserContext';
 import { TextInput } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import { launchCamera, launchImageLibrary, CameraOptions, ImageLibraryOptions } from 'react-native-image-picker';
+import PhoneInput from "react-native-phone-number-input";
 
 
 const languageCodes = {
@@ -96,22 +97,23 @@ export default function App() {
     allergies: userContext.user.allergies,
     healthConditions: userContext.user.healthConditions,
     language: userContext.user.language || 'en',
+    emergencyPhoneNumber: userContext.user.emergencyPhoneNumber
   });
 
   const handleEditToggle = () => {
     if (isEditing) {
-      userContext.setUser({...userContext.user, ...userInfo});
+      userContext.setUser({ ...userContext.user, ...userInfo });
     }
     setIsEditing(!isEditing);
   };
 
   const updateProfileImage = () => {
     if (!isEditing) return;
-  
+
     const options: CameraOptions & ImageLibraryOptions = {
       mediaType: 'photo',
     };
-  
+
     Alert.alert(
       "Update Profile Picture",
       "Choose an option",
@@ -156,11 +158,11 @@ export default function App() {
   return (
     <ScrollView style={styles.scrollView}>
       <View style={styles.container}>
-          <TouchableOpacity onPress={updateProfileImage} disabled={!isEditing}>
-              <Image
-                source={profileImage ? { uri: profileImage } : require('@/assets/images/default-profile-icon.png')}
-                style={styles.profilePic}
-              />
+        <TouchableOpacity onPress={updateProfileImage} disabled={!isEditing}>
+          <Image
+            source={profileImage ? { uri: profileImage } : require('@/assets/images/default-profile-icon.png')}
+            style={styles.profilePic}
+          />
         </TouchableOpacity>
         <View style={styles.userInfo}>
           {Object.keys(userInfo).map(key => (
@@ -193,6 +195,16 @@ export default function App() {
               )}
             </View>
           ))}
+          <PhoneInput
+            defaultCode="US"
+            layout="first"
+            onChangeFormattedText={(text) => {
+              var re = /^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/gm
+              if (re.test(text)) {
+                userContext.setUser({ ...userContext.user, emergencyPhoneNumber: text });
+              }
+            }}
+          />
         </View>
         <TouchableOpacity onPress={handleEditToggle} style={styles.buttonStyle}>
           <Text style={styles.buttonText}>{isEditing ? 'Confirm' : 'Edit Information'}</Text>
@@ -235,14 +247,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 20, 
+    borderRadius: 20,
     marginTop: 20,
   },
   buttonText: {
-    color: 'white', 
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center', 
+    textAlign: 'center',
   },
   userInfoEdit: {
     flex: 1,
@@ -251,10 +263,10 @@ const styles = StyleSheet.create({
   },
   profilePic: {
     marginTop: 10,
-    width: 150, 
-    height: 150, 
-    borderRadius: 75, 
-    marginBottom: 20, 
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 20,
   },
   picker: {
     width: '100%',
