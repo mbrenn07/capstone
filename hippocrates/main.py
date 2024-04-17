@@ -18,7 +18,7 @@ sentences = json.load(sentencesFile)
 embeddings = model.encode(sentences)
 sentencesFile.close()
 
-previousMessages = []
+previousMessages = [{'role': 'system', 'content': "You are a bot designed to help diagnose the user's symptoms, answer consisely and with specific potential diseases"}]
 
 # Begin API
 
