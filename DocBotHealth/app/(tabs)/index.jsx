@@ -126,10 +126,17 @@ export default function TabOneScreen() {
       messages.push({ role: "assistant", message: "" });
       setMessages([...messages]);
       setRecievingResponse(true);
+      let showMessage = true;
       const stream = await generateStream();
       for await (const chunk of stream) {
-        messages[messages.length - 1].message = messages[messages.length - 1].message + chunk;
-        setMessages([...messages]);
+        if (chunk.includes("[")) {
+          showMessage = false;
+        }
+
+        if (showMessage) {
+          messages[messages.length - 1].message = messages[messages.length - 1].message + chunk;
+          setMessages([...messages]);
+        }
       }
       setRecievingResponse(false);
     }
