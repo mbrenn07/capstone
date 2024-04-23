@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Modal, Button } from 'react-native';
+
 import  AppleHealthKit, { HealthKitPermissions, HealthDateOfBirth, HealthValue, HealthUnitOptions}  from 'react-native-health';
 import { useEffect, useState } from 'react'
 import { LineChart , ProgressChart, BarChart} from 'react-native-chart-kit';
@@ -112,7 +113,10 @@ export default function App() {
   const [currentDate, setCurrentDate] = useState("");
   const [heartRateData, setHeartRateData] = useState<number[]>([]);
   const [sleepData, setSleepData] = useState<number[]>([]);
-  //for 
+
+  const [selectedChart, setSelectedChart] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
 
   useEffect(() => {
     AppleHealthKit.initHealthKit(permissions, (err) => {
@@ -126,10 +130,20 @@ export default function App() {
       fetchStepCount();
       const intervalId = setInterval(fetchStepCount, 60000); // Fetch every minute
       
-      return () => clearInterval(intervalId); // Cleanup on component unmount
+      return () => clearInterval(intervalId); 
     })
     setCurrentDate(getCurrentDate());
   }, []);
+
+  const handleChartSelection = (chartType) => {
+    setSelectedChart(chartType);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setSelectedChart(null);
+  };
 
   const getCurrentDate = () => {
     const date = new Date();
@@ -214,21 +228,55 @@ export default function App() {
           <Text style={styles.chartLabel}>
             Steps Taken on {currentDate}
           </Text>
-          <ProgressChart
-            data={{
-              labels: [""],
-              data: [stepsData],
-            }}
-            width={Dimensions.get('window').width}
-            height={220}
-            strokeWidth={16}
-            radius={32}
-            chartConfig={chartConfig}
-            hideLegend={false}
-          />
-          <Text style={styles.stepCountText}>
-            {totalSteps} steps
-          </Text>
+          {/* Buttons for selecting chart */}
+          <TouchableOpacity onPress={() => handleChartSelection('progress')}>
+            <Text style={styles.button}>Progress Chart</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleChartSelection('line')}>
+            <Text style={styles.button}>Line Chart</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleChartSelection('bar')}>
+            <Text style={styles.button}>Bar Chart</Text>
+          </TouchableOpacity>
+
+          {/* Modal for displaying chart */}
+          <Modal
+            visible={isModalVisible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={closeModal}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                {/* Render selected chart */}
+                {selectedChart === 'progress' && (
+                  <ProgressChart
+                    data={{
+                      labels: ["Steps"],
+                      data: [stepsData], // Sample data, replace with your actual data
+                    }}
+                    width={Dimensions.get('window').width - 40}
+                    height={220}
+                    strokeWidth={16}
+                    radius={32}
+                    chartConfig={chartConfig}
+                    hideLegend={false}
+                  />
+                )}
+                {selectedChart === 'line' && (
+                  <LineChart
+                    // Line chart configuration
+                  />
+                )}
+                {selectedChart === 'bar' && (
+                  <BarChart
+                    // Bar chart configuration
+                  />
+                )}
+                <Button title="Back" onPress={closeModal} />
+              </View>
+            </View>
+          </Modal>
         </View>
       ) : (
         <Text>No data available</Text>
@@ -260,5 +308,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  chartLabel: {
+    // Styles for chart label
+  },
+  button: {
+    // Styles for buttons
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: 'lightblue',
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
   },
 });
