@@ -25,6 +25,7 @@
     "react-native-fetch-api": "^3.0.0",
     "react-native-get-random-values": "^1.11.0",
     "react-native-health": "^1.18.0",
+    "react-native-image-picker": "^7.1.2",
     "react-native-paper": "^5.12.3",
     "react-native-phone-number-input": "^2.1.0",
     "react-native-polyfill-globals": "^3.1.0",

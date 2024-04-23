@@ -30,6 +30,9 @@ Note: If encountering an error like "Unable to resolve "x" from "y", cd into "Do
       then cd in into "ios/" and run "pod install", then repeat steps 6-8.
 
 Note: If any errors relating to pods occur, make sure that there are no spaces in the names of the files in your working directory.
+
+Note: For building on a physical device, open the DocBotHeatlh/ios/ folder in xCode, build it with your device plugged into your mac, then scan the QR code given when calling `npm run ios` normally.
+
 ### Both
 
 9) `bash start.sh`
