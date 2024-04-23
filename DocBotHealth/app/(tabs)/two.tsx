@@ -7,6 +7,7 @@ import { TextInput } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import { launchCamera, launchImageLibrary, CameraOptions, ImageLibraryOptions } from 'react-native-image-picker';
 import PhoneInput from "react-native-phone-number-input";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const languageCodes = {
@@ -77,16 +78,36 @@ interface UserInfo {
   weight: string;
   allergies: string;
   healthConditions: string;
-  [key: string]: string;
+  language: string;
+  emergencyPhoneNumber: string;
+  profileImage: string;
 }
 
 const codeToLanguage = Object.fromEntries(Object.entries(languageCodes).map(([name, code]) => [code, name]));
 
+const storeUserData = async (userInfo) => {
+  try {
+    const jsonValue = JSON.stringify(userInfo);
+    await AsyncStorage.setItem('userData', jsonValue);
+  } catch (e) {
+    console.error('Failed to save user data:', e);
+  }
+}
+
+const loadUserData = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('userData');
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch(e) {
+    console.error('Failed to load user data:', e);
+    return null;
+  }
+}
+
+
 export default function App() {
   const userContext = useContext(UserContext);
   const [isEditing, setIsEditing] = useState(false);
-  const [profileImage, setProfileImage] = useState(userContext.user.profileImage);
-
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: userContext.user.name,
     age: userContext.user.age,
@@ -97,9 +118,29 @@ export default function App() {
     allergies: userContext.user.allergies,
     healthConditions: userContext.user.healthConditions,
     language: userContext.user.language || 'en',
-    emergencyPhoneNumber: userContext.user.emergencyPhoneNumber
+    emergencyPhoneNumber: userContext.user.emergencyPhoneNumber,
+    profileImage: userContext.user.profileImage || ''
   });
 
+  const imageSource = userInfo.profileImage
+  ? { uri: userInfo.profileImage }
+  : require('@/assets/images/default-profile-icon.png');
+
+  useEffect(() => {
+    loadUserData().then(data => {
+      if (data) {
+        setUserInfo(data);
+        userContext.setUser(data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (userInfo) {
+      storeUserData(userInfo);
+    }
+  }, [userInfo]);
+  
   const handleEditToggle = () => {
     if (isEditing) {
       userContext.setUser({ ...userContext.user, ...userInfo });
@@ -109,11 +150,11 @@ export default function App() {
 
   const updateProfileImage = () => {
     if (!isEditing) return;
-
+  
     const options: CameraOptions & ImageLibraryOptions = {
       mediaType: 'photo',
     };
-
+  
     Alert.alert(
       "Update Profile Picture",
       "Choose an option",
@@ -125,29 +166,13 @@ export default function App() {
         {
           text: "Take Photo",
           onPress: () => launchCamera(options, (response) => {
-            if (response.didCancel) {
-              console.log('User cancelled image capture');
-            } else if (response.errorCode) {
-              console.log('ImagePicker Error: ', response.errorMessage);
-            } else {
-              const source = { uri: response.assets[0].uri };
-              setProfileImage(source.uri);
-              userContext.setUser({ ...userContext.user, profileImage: source.uri });
-            }
+            handleImageResponse(response);
           }),
         },
         {
           text: "Choose from Library",
           onPress: () => launchImageLibrary(options, (response) => {
-            if (response.didCancel) {
-              console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-              console.log('ImagePicker Error: ', response.errorMessage);
-            } else {
-              const source = { uri: response.assets[0].uri };
-              setProfileImage(source.uri);
-              userContext.setUser({ ...userContext.user, profileImage: source.uri });
-            }
+            handleImageResponse(response);
           }),
         },
       ],
@@ -155,55 +180,69 @@ export default function App() {
     );
   };
 
+  const handleImageResponse = (response) => {
+    if (response.didCancel) {
+      console.log('User cancelled image selection.');
+    } else if (response.errorCode) {
+      console.log('ImagePicker Error: ', response.errorMessage);
+    } else {
+      const source = { uri: response.assets[0].uri };
+      setUserInfo({...userInfo, profileImage: source.uri});
+    }
+  };
+
   return (
     <ScrollView style={styles.scrollView}>
       <View style={styles.container}>
         <TouchableOpacity onPress={updateProfileImage} disabled={!isEditing}>
           <Image
-            source={profileImage ? { uri: profileImage } : require('@/assets/images/default-profile-icon.png')}
+            source={imageSource}
             style={styles.profilePic}
           />
         </TouchableOpacity>
         <View style={styles.userInfo}>
-          {Object.keys(userInfo).map(key => (
-            <View style={styles.fullWidth} key={key}>
-              <Text style={styles.userInfoText}>{formatTitle(key)}:</Text>
-              {isEditing ? (
-                key === 'language' ? (
-                  <Picker
-                    selectedValue={userInfo.language}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setUserInfo({ ...userInfo, language: itemValue })}
-                  >
-                    {Object.entries(languageCodes).map(([language, code]) => (
-                      <Picker.Item key={code} label={language} value={code} />
-                    ))}
-                  </Picker>
+          {Object.keys(userInfo).map(key => {
+            if (key === 'profileImage') return null;
+            return (
+              <View style={styles.fullWidth} key={key}>
+                <Text style={styles.userInfoText}>{formatTitle(key)}:</Text>
+                {isEditing ? (
+                  key === 'language' ? (
+                    <Picker
+                      selectedValue={userInfo.language}
+                      style={styles.picker}
+                      onValueChange={(itemValue) => setUserInfo({ ...userInfo, language: itemValue })}
+                    >
+                      {Object.entries(languageCodes).map(([language, code]) => (
+                        <Picker.Item key={code} label={language} value={code} />
+                      ))}
+                    </Picker>
                   ) : key === 'emergencyPhoneNumber' ? (
-                  <PhoneInput
+                    <PhoneInput
                       value={userInfo.emergencyPhoneNumber}
                       defaultCode="US"
                       layout="first"
                       onChangeFormattedText={(text) => {
                         setUserInfo({...userInfo, emergencyPhoneNumber: text});
                       }}
-                  />
+                    />
+                  ) : (
+                    <TextInput
+                      style={styles.userInfoEdit}
+                      value={userInfo[key]}
+                      onChangeText={(text) => setUserInfo({ ...userInfo, [key]: text })}
+                    />
+                  )
                 ) : (
-                  <TextInput
-                    style={styles.userInfoEdit}
-                    value={userInfo[key]}
-                    onChangeText={(text) => setUserInfo({ ...userInfo, [key]: text })}
-                  />
-                )
-              ) : (
-                key === 'language' ? (
-                  <Text style={styles.userInfoText}>{codeToLanguage[userInfo.language]}</Text>  // Display the language name
-                ) : (
-                  <Text style={styles.userInfoText}>{userInfo[key]}</Text>
-                )
-              )}
-            </View>
-          ))}
+                  key === 'language' ? (
+                    <Text style={styles.userInfoText}>{codeToLanguage[userInfo.language]}</Text>
+                  ) : (
+                    <Text style={styles.userInfoText}>{userInfo[key]}</Text>
+                  )
+                )}
+              </View>
+            );
+          })}
         </View>
         <TouchableOpacity onPress={handleEditToggle} style={styles.buttonStyle}>
           <Text style={styles.buttonText}>{isEditing ? 'Confirm' : 'Edit Information'}</Text>
@@ -274,8 +313,7 @@ const styles = StyleSheet.create({
 });
 
 function formatTitle(key) {
-  // Split the string at each uppercase letter, but include the letter in the result
   return key
-    .replace(/([A-Z])/g, ' $1') // Insert a space before each uppercase letter
-    .replace(/^./, (str) => str.toUpperCase()); // Capitalize the first letter of the string
+    .replace(/([A-Z])/g, ' $1') 
+    .replace(/^./, (str) => str.toUpperCase()); 
 }
