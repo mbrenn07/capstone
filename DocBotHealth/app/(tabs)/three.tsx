@@ -253,7 +253,7 @@ export default function App() {
                   <ProgressChart
                     data={{
                       labels: ["Steps"],
-                      data: [stepsData], // Sample data, replace with your actual data
+                      data: [stepsData],
                     }}
                     width={Dimensions.get('window').width - 40}
                     height={220}
