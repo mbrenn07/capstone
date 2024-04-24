@@ -69,19 +69,19 @@ const languageCodes = {
   'Welsh': 'cy',
 };
 
-interface UserInfo {
-  name: string;
-  age: string;
-  address: string;
-  city: string;
-  height: string;
-  weight: string;
-  allergies: string;
-  healthConditions: string;
-  language: string;
-  emergencyPhoneNumber: string;
-  profileImage: string;
-}
+const userKeys = [
+  "name", 
+  "age",
+  "address",
+  "city",
+  "height",
+  "weight",
+  "allergies",
+  "healthConditions",
+  "language",
+  "emergencyPhoneNumber",
+  "profileImage"
+]
 
 const codeToLanguage = Object.fromEntries(Object.entries(languageCodes).map(([name, code]) => [code, name]));
 
@@ -97,7 +97,17 @@ const storeUserData = async (userInfo) => {
 const loadUserData = async () => {
   try {
     const jsonValue = await AsyncStorage.getItem('userData');
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
+    if (jsonValue === null) {
+      return null;
+    }
+    const userData = JSON.parse(jsonValue);
+    userKeys.forEach((key) => {
+      if (userData[key] == undefined) {
+        userData[key] = undefined
+      }
+    })
+    
+    return userData;
   } catch(e) {
     console.error('Failed to load user data:', e);
     return null;
@@ -108,7 +118,7 @@ const loadUserData = async () => {
 export default function App() {
   const userContext = useContext(UserContext);
   const [isEditing, setIsEditing] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserInfo>({
+  const [userInfo, setUserInfo] = useState({
     name: userContext.user.name,
     age: userContext.user.age,
     address: userContext.user.address,
@@ -151,7 +161,7 @@ export default function App() {
   const updateProfileImage = () => {
     if (!isEditing) return;
   
-    const options: CameraOptions & ImageLibraryOptions = {
+    const options = {
       mediaType: 'photo',
     };
   

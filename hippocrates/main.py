@@ -27,10 +27,13 @@ cors = CORS(app)
 
 @app.route("/initialPrompt/<initialPrompt>")
 def initialPrompt(initialPrompt):
+    previousMessages.clear()
     previousMessages.append({
             'role': 'system',
             'content': initialPrompt,
     })
+
+    return Response(status=204) 
 
 @app.route("/chat/<message>")
 def main(message):
@@ -77,4 +80,4 @@ def main(message):
 @app.route("/clear")
 def clear():
     previousMessages.clear()
-    return None
+    return Response(status=204)

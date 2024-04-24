@@ -83,7 +83,7 @@ export default function TabOneScreen() {
   const [messages, setMessages] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState('English (US)');
   const [recievingResponse, setRecievingResponse] = useState(false);
-  const user = useContext(UserContext);
+  const userContext = useContext(UserContext);
 
   const baseURL = "http://10.0.2.2:5000/";
 
@@ -91,6 +91,27 @@ export default function TabOneScreen() {
     baseURL: baseURL, //use 10.0.2.2 instead of localhost for android virtual machine
     timeout: undefined
   });
+
+  useEffect(() => {
+    let userMessage = "The following is information about the patient: ";
+    if (userContext.user.age != undefined) {
+      userMessage = userMessage + userContext.user.age + " years old.";
+    }
+
+    if (userContext.user.allergies != undefined) {
+      userMessage = userMessage + " Allergic to: " + userContext.user.allergies + ".";
+    }
+
+    if (userContext.user.healthConditions != undefined) {
+      userMessage = userMessage + " Prexisting health conditions: " + userContext.user.healthConditions + ".";
+    }
+
+    //only set the prompt if some info is present
+    if (userMessage !== "The following is information about the patient: ") {
+      baseInstance.get('/initialPrompt/' + userMessage);
+    }
+  }, [userContext]);
+
 
   const generateStream = async () => {
     const response = await fetch(
@@ -180,7 +201,7 @@ export default function TabOneScreen() {
       </ScrollView>
       <View style={styles.messageBar}>
         <TextInput
-          contentStyle={{backgroundColor: "white", paddingLeft: 15}}
+          contentStyle={{ backgroundColor: "white", paddingLeft: 15 }}
           disabled={recievingResponse}
           onSubmitEditing={(e) => {
             e.preventDefault();
